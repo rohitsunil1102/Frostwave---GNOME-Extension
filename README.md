@@ -1,8 +1,8 @@
 # Frostwave
 
 A frosted-glass music widget for the GNOME desktop. It shows what's playing in
-Spotify — cover art, title, artist and album — with all the playback controls,
-right on your desktop.
+Spotify, YouTube Music, Deezer and other music players — cover art, title,
+artist and album — with all the playback controls, right on your desktop.
 
 ![Frostwave playing a song from Spotify](docs/screenshots/frostwave.png)
 
@@ -15,8 +15,8 @@ right on your desktop.
   album art) and corner radius. Or use the blurred album art as the background.
 - **All the controls**: play/pause, previous/next, shuffle, repeat
   (off / playlist / track), a seek bar and volume with mute.
-- **Copy the song link** to share it, or click the cover to bring up Spotify.
-  If Spotify isn't running, the widget offers to open it.
+- **Copy the song link** to share it, or click the cover to bring up the player.
+  If the player isn't running, the widget offers to open it.
 - **Top bar button** with the current song and the same player in its menu.
 - Drag the widget anywhere, lock its position, and scale it from 70 % to 160 %.
 - Optionally controls other media players too (browsers, VLC, …).
@@ -24,7 +24,7 @@ right on your desktop.
 ## Requirements
 
 - GNOME Shell 50 (Ubuntu 26.04 LTS, Fedora 44, …)
-- The Spotify desktop app (Snap, Flatpak or `.deb`), or any other player that
+- The Spotify, YouTube Music or Deezer desktop app, or any other player that
   supports [MPRIS](https://specifications.freedesktop.org/mpris-spec/latest/)
   once *Other Media Players* is enabled.
 
@@ -60,15 +60,15 @@ gnome-extensions enable frostwave@rohitsunil1102.github.io
 
 ## Good to know
 
-- Spotify only exposes playback controls to the desktop (through MPRIS), so
-  features such as *liking* a song or browsing playlists aren't available.
+- Music services only expose playback controls to the desktop (through MPRIS),
+  so features such as *liking* a song or browsing playlists aren't available.
 - Whether volume, shuffle and repeat can be changed depends on the player;
   controls a player doesn't support are hidden.
 - In *Below windows* mode the glass blurs the wallpaper. In *Above windows* mode
   it blurs the windows underneath it as they change.
 - **Privacy**: the cover art is downloaded from the image address the player
-  provides (for Spotify, its image server). The clipboard is only written when
-  you press the copy-link button. Nothing else leaves your computer.
+  provides. The clipboard is only written when you press the copy-link button.
+  Nothing else leaves your computer.
 
 ## Development
 
@@ -80,6 +80,7 @@ src/
 ├── schemas/             GSettings schema
 └── lib/
     ├── mpris.js         MPRIS D-Bus client: finds players, reads state, sends commands
+    ├── musicServices.js music services shown by default (Spotify, YouTube Music, Deezer)
     ├── artwork.js       downloads and decodes album art, picks an accent color
     ├── nowPlaying.js    shared state for all views (active player, artwork, position)
     ├── playerView.js    the player UI: cover, track info, seek bar, controls, volume

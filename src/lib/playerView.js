@@ -87,7 +87,7 @@ class PlayerView extends St.BoxLayout {
 
         this._launchButton = new St.Button({
             style_class: 'frostwave-launch-button',
-            label: _('Open Spotify'),
+            label: _('Open Music Player'),
             x_align: Clutter.ActorAlign.CENTER,
             can_focus: true,
         });
@@ -317,14 +317,18 @@ class PlayerView extends St.BoxLayout {
         this._player = player;
 
         const hasPlayer = player !== null;
+        const musicApp = this._nowPlaying.musicApp;
         this._controls.visible = hasPlayer;
-        this._launchButton.visible = !hasPlayer && this._nowPlaying.spotifyApp !== null;
+        this._launchButton.visible = !hasPlayer && musicApp !== null;
+        this._launchButton.label = musicApp
+            ? _('Open %s').replace('%s', musicApp.name)
+            : '';
 
         if (!hasPlayer) {
             this._sourceLabel.text = '';
             this._titleLabel.text = _('Nothing playing');
-            this._artistLabel.text = this._nowPlaying.spotifyApp
-                ? _('Spotify isn’t running')
+            this._artistLabel.text = musicApp
+                ? _('%s isn’t running').replace('%s', musicApp.name)
                 : _('No media player found');
             this._albumLabel.text = '';
             this._copyButton.visible = false;
@@ -333,7 +337,7 @@ class PlayerView extends St.BoxLayout {
             return;
         }
 
-        this._sourceLabel.text = player.identity.toUpperCase();
+        this._sourceLabel.text = (player.service?.name ?? player.identity).toUpperCase();
         this._titleLabel.text = player.title ||
             (player.status === 'Stopped' ? _('Nothing playing') : player.identity);
         this._artistLabel.text = player.artists.join(', ');

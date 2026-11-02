@@ -11,15 +11,9 @@ import St from 'gi://St';
 
 import {ArtworkLoader} from './artwork.js';
 import {PlayerManager, isCancelled} from './mpris.js';
+import {MUSIC_SERVICES} from './musicServices.js';
 
 const POSITION_UPDATE_MS = 1000;
-
-// Snap, Flatpak and distribution packages of the Spotify client
-const SPOTIFY_APP_IDS = [
-    'spotify_spotify.desktop',
-    'com.spotify.Client.desktop',
-    'spotify.desktop',
-];
 
 function createImageContent(pixbuf) {
     const coglContext = global.stage.context.get_backend().get_cogl_context();
@@ -81,19 +75,19 @@ export const NowPlaying = GObject.registerClass({
         return this._manager.activePlayer;
     }
 
-    /** @type {Shell.App|null} the installed Spotify app, if any */
-    get spotifyApp() {
-        const appSystem = Shell.AppSystem.get_default();
-        for (const id of SPOTIFY_APP_IDS) {
-            const app = appSystem.lookup_app(id);
+    /** @type {{name: string, app: Shell.App}|null} first installed music app */
+    get musicApp() {
+        for (const service of MUSIC_SERVICES) {
+            const app = this._findApp(service);
             if (app)
-                return app;
+                return {name: service.name, app};
         }
         return null;
     }
 
     /**
-     * Brings the player's window to the front, or starts Spotify.
+     * Brings the player's window to the front, or starts the matching music
+     * app (or another installed one if no player is running).
      */
     showPlayer() {
         const player = this.player;
@@ -104,11 +98,31 @@ export const NowPlaying = GObject.registerClass({
 
         const appSystem = Shell.AppSystem.get_default();
         const entry = player?.desktopEntry;
-        const app = entry
+        let app = entry
             ? appSystem.lookup_app(`${entry}.desktop`) ??
               appSystem.lookup_app(`${entry}_${entry}.desktop`)
             : null;
-        (app ?? this.spotifyApp)?.activate();
+
+        if (!app && player?.service)
+            app = this._findApp(player.service);
+        if (!app && !player)
+            app = this.musicApp?.app;
+
+        app?.activate();
+    }
+
+    /**
+     * @param {object} service
+     * @returns {Shell.App|null} the installed app for the service, if any
+     */
+    _findApp(service) {
+        const appSystem = Shell.AppSystem.get_default();
+        for (const id of service.desktopIds) {
+            const app = appSystem.lookup_app(id);
+            if (app)
+                return app;
+        }
+        return null;
     }
 
     /**

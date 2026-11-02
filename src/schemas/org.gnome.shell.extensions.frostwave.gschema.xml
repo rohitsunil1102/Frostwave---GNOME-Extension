@@ -104,7 +104,7 @@
     <key name="other-players" type="b">
       <default>false</default>
       <summary>Control other media players</summary>
-      <description>Also show media players other than Spotify, such as web browsers.</description>
+      <description>Also show media players other than Spotify, YouTube Music and Deezer, such as web browsers.</description>
     </key>
     <key name="hide-when-inactive" type="b">
       <default>false</default>

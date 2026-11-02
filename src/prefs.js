@@ -94,7 +94,7 @@ export default class FrostwavePreferences extends ExtensionPreferences {
         const group = new Adw.PreferencesGroup({title: _('Players')});
 
         group.add(this._switchRow(settings, 'other-players', _('Other Media Players'),
-            _('Also show browsers, video players and other apps when Spotify isn’t playing')));
+            _('Also show browsers, video players and other apps')));
         group.add(this._switchRow(settings, 'hide-when-inactive', _('Hide When No Player Is Running')));
 
         return group;

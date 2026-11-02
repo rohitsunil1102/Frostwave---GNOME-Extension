@@ -1,21 +1,21 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 
-// Client for the MPRIS D-Bus interface that media players (Spotify, browsers,
-// VLC, ...) use to publish their state and accept remote control commands.
+// Client for the MPRIS D-Bus interface that media players (Spotify, YouTube
+// Music, Deezer, browsers, VLC, ...) use to publish their state and accept
+// remote control commands.
 // https://specifications.freedesktop.org/mpris-spec/latest/
 
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
 
+import {serviceForBusName, serviceForDesktopEntry, serviceForIdentity, serviceForUrl} from './musicServices.js';
+
 const BUS_NAME_PREFIX = 'org.mpris.MediaPlayer2.';
 const OBJECT_PATH = '/org/mpris/MediaPlayer2';
 const ROOT_IFACE = 'org.mpris.MediaPlayer2';
 const PLAYER_IFACE = 'org.mpris.MediaPlayer2.Player';
 const CALL_TIMEOUT_MS = 5000;
-
-// The official client, plus the spotifyd and ncspot clients.
-const SPOTIFY_BUS_NAME = /^org\.mpris\.MediaPlayer2\.(spotify|spotifyd|ncspot)(\.|$)/;
 
 const MPRIS_XML = `<node>
   <interface name="org.mpris.MediaPlayer2">
@@ -95,7 +95,9 @@ export const MprisPlayer = GObject.registerClass({
         super();
 
         this.busName = busName;
-        this.isSpotify = SPOTIFY_BUS_NAME.test(busName);
+        // Matched by bus name first; the track URL catches services running
+        // in a browser or under a generic bus name.
+        this._busService = serviceForBusName(busName);
         // Monotonic time (µs) at which the player was last seen playing
         this.lastPlayed = 0;
 
@@ -231,6 +233,18 @@ export const MprisPlayer = GObject.registerClass({
 
     get canRaise() {
         return this._rootProperty('CanRaise') ?? false;
+    }
+
+    /** @type {object|null} the recognised music service, if any */
+    get service() {
+        return this._busService ??
+            serviceForUrl(this.url) ??
+            serviceForDesktopEntry(this.desktopEntry) ??
+            serviceForIdentity(this.identity);
+    }
+
+    get isMusicService() {
+        return this.service !== null;
     }
 
     /** @type {'Playing'|'Paused'|'Stopped'} */
@@ -551,7 +565,8 @@ export const PlayerManager = GObject.registerClass({
     }
 
     /**
-     * Prefer a playing player, then the current one, then Spotify.
+     * Prefer a playing player, then the current one, then a recognised music
+     * service.
      *
      * @returns {boolean} whether the active player changed
      */
@@ -560,12 +575,12 @@ export const PlayerManager = GObject.registerClass({
         let bestScore = -1;
 
         for (const {player} of this._players.values()) {
-            if (!player.ready || (!player.isSpotify && !this._includeOtherPlayers))
+            if (!player.ready || (!player.isMusicService && !this._includeOtherPlayers))
                 continue;
 
             const score = (player.playing ? 4 : 0) +
                 (player === this._activePlayer ? 2 : 0) +
-                (player.isSpotify ? 1 : 0);
+                (player.isMusicService ? 1 : 0);
             if (score > bestScore ||
                 (score === bestScore && player.lastPlayed > best.lastPlayed)) {
                 best = player;

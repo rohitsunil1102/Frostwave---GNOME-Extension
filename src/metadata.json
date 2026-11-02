@@ -1,7 +1,7 @@
 {
   "uuid": "frostwave@rohitsunil1102.github.io",
   "name": "Frostwave",
-  "description": "A frosted-glass music widget for your desktop.\n\nShows the album art, song title, artist and album of the track playing in Spotify, with play/pause, previous/next, shuffle, repeat, a seek bar and volume control. The widget sits on the desktop below your windows (or floats above them) and is also available from the top bar.\n\nChoose between frosted glass and blurred album art backgrounds, and adjust the blur, transparency, tint, corner radius and size. Other media players can be enabled in the preferences.\n\nAlbum art is downloaded from the image address the media player provides. The copy-link button places the song's web link on the clipboard.",
+  "description": "A frosted-glass music widget for your desktop.\n\nShows the album art, song title, artist and album of the track playing in Spotify, YouTube Music, Deezer and other music players, with play/pause, previous/next, shuffle, repeat, a seek bar and volume control. The widget sits on the desktop below your windows (or floats above them) and is also available from the top bar.\n\nChoose between frosted glass and blurred album art backgrounds, and adjust the blur, transparency, tint, corner radius and size. Other media players can be enabled in the preferences.\n\nAlbum art is downloaded from the image address the media player provides. The copy-link button places the song's web link on the clipboard.",
   "version-name": "1.0",
   "shell-version": [
     "50"
